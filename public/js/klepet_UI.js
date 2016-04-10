@@ -1,22 +1,30 @@
 function divElementEnostavniTekst(sporocilo) {
   var jeSmesko = sporocilo.indexOf('http://sandbox.lavbic.net/teaching/OIS/gradivo/') > -1;
   
-  // SLIKE
-  var jeSlika = false;
-  var slike = "";
+
+  
+  // SLIKE IN YOUTUBE
+  var jeSlikaAliYoutube = false;
+  var slikeInYoutube = "";
   var regexSlika = new RegExp("^(https?://).+(\.(?:jpg|gif|png))$", 'i');
+  var regexYoutube = new RegExp("^(https://www\.youtube\.com/watch\\?v=)[a-z0-9]+", 'i'); ///watch\?v=)\w{11}
   var besede = sporocilo.split(" ");
   for(var i = 0; i < besede.length; i++){
     //console.log('"' + besede[i] + '"?');
     if(regexSlika.test(besede[i])) {
-      slike += '<br /><img class="poslanaSlika" src="' + besede[i] + '" />';
-      jeSlika = true;
+      slikeInYoutube += '<br /><img class="poslanaSlika" src="' + besede[i] + '" />';
+      jeSlikaAliYoutube = true;
+    }
+    if(regexYoutube.test(besede[i])) {
+      var videoId = besede[i].substring("https://www.youtube.com/watch?v=".length, besede[i].length);
+      slikeInYoutube += '<br /><iframe src="https://www.youtube.com/embed/' + videoId + '" allowfullscreen></iframe>';
+      jeSlikaAliYoutube = true;
     }
   }
   
-  if (jeSmesko || jeSlika) {
+  if (jeSmesko || jeSlikaAliYoutube) {
     sporocilo = sporocilo.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace('&lt;img', '<img').replace('png\' /&gt;', 'png\' />');
-    sporocilo += slike;
+    sporocilo += slikeInYoutube;
     return $('<div style="font-weight: bold"></div>').html(sporocilo);
   } else {
     return $('<div style="font-weight: bold;"></div>').text(sporocilo);
